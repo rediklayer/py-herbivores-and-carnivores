@@ -1,10 +1,13 @@
+from typing import List, Union, Type
+
+
 class Animal:
-    alive = []
+    alive: List["Animal"] = []
 
     def __init__(self, name: str, health: int = 100) -> None:
-        self.name = name
-        self.health = health
-        self.hidden = False
+        self.name: str = name
+        self.health: int = health
+        self.hidden: bool = False
         Animal.alive.append(self)
 
     def __repr__(self) -> str:
@@ -13,8 +16,15 @@ class Animal:
                 f"Hidden: {self.hidden}}}")
 
     @classmethod
-    def remove_dead(cls) -> None:
+    def remove_dead(cls: Type["Animal"]) -> None:
         cls.alive = [animal for animal in cls.alive if animal.health > 0]
+
+    @classmethod
+    def __str__(cls) -> str:
+        return str([{"Name": animal.name,
+                     "Health": animal.health,
+                     "Hidden": animal.hidden}
+                    for animal in cls.alive])
 
 
 class Herbivore(Animal):
@@ -23,7 +33,8 @@ class Herbivore(Animal):
 
 
 class Carnivore(Animal):
-    def bite(self, herbivore: Animal) -> None:
-        if isinstance(herbivore, Herbivore) and not herbivore.hidden:
-            herbivore.health -= 50
-            Animal.remove_dead()
+    def bite(self, target: Union[Animal, object]) -> None:
+        if isinstance(target, Animal):
+            if isinstance(target, Herbivore) and not target.hidden:
+                target.health -= 50
+        Animal.remove_dead()
